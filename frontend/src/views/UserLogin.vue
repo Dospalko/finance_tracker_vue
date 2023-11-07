@@ -34,7 +34,8 @@ export default {
         // Replace 'this.$http' with 'axios' if you haven't set up an Axios instance
         const response = await axios.post('http://localhost:3000/auth/login', this.user);
         localStorage.setItem('token', response.data.token); // Assuming the token is in response.data.token
-        this.$router.push({ name: 'dashboard' }); // Ensure you have a route named 'dashboard'
+        this.$router.push({ name: 'dashboard' });
+ // Ensure you have a route named 'dashboard'
       } catch (error) {
         if (error.response) {
           // Handle server-side error (e.g., invalid credentials)
