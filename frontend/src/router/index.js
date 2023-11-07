@@ -1,7 +1,7 @@
 
 import Login from "@/views/UserLogin.vue";
 import Register from "@/views/UserRegister.vue";
-
+import HomeDashboard from "@/views/HomeDashboard.vue";
 import { createRouter, createWebHistory } from "vue-router";
 
 
@@ -19,6 +19,11 @@ const router = createRouter({
       path: "/register",
       name: "UserRegister",
       component: Register,
+    },
+    {
+      path: '/dashboard',
+      name: 'dashboard',
+      component: HomeDashboard
     },
     // ... define other routes
   ],
