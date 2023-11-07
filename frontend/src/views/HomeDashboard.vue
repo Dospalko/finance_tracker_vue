@@ -1,71 +1,67 @@
 <template>
   <div class="container mx-auto p-4">
     <h2 class="text-xl font-bold mb-4">Dashboard</h2>
-
-    <div class="mb-6">
-      <h3 class="text-lg font-semibold">Current Balance</h3>
-      <!-- Display current balance here -->
-    </div>
-
-    <div class="mb-6">
+    <div v-if="isLoading">Loading...</div>
+    <div v-else-if="error">{{ error }}</div>
+    <div v-else>
       <h3 class="text-lg font-semibold">Recent Transactions</h3>
-      <!-- List of recent transactions will go here -->
+      <ul>
+        <li v-for="transaction in transactions" :key="transaction.id">
+          {{ transaction.date }} - {{ transaction.amount }}
+        </li>
+      </ul>
     </div>
-
-    <div class="mb-6">
-      <h3 class="text-lg font-semibold">Budget Summary</h3>
-      <!-- Budget summary or status will go here -->
-    </div>
-
     <div>
-      <h3 class="text-lg font-semibold">Financial Overview</h3>
-      <!-- Chart or graph for financial data -->
-      <div id="financial-chart"></div>
-    </div>
+    <form @submit.prevent="addTransaction">
+      <input type="number" v-model="newTransaction.amount" placeholder="Amount">
+      <button type="submit">Add Transaction</button>
+    </form>
+  </div>
   </div>
 </template>
+
 <script>
-
-import { Chart, registerables } from 'chart.js';
-
-
-Chart.register(...registerables);
+import axios from 'axios';
 
 export default {
   data() {
     return {
       transactions: [],
-      currentBalance: 0,
-      // Add other relevant data structures as needed
+      isLoading: true,
+      error: null,
+      newTransaction: {
+        amount: null,
+        date: new Date().toISOString().slice(0, 10) // current date in YYYY-MM-DD format
+      }
     };
   },
-  mounted() {
-    this.createChart();
+  async mounted() {
+    await this.fetchTransactions();
   },
   methods: {
-    createChart() {
-      const ctx = document.getElementById('financial-chart').getContext('2d');
-      new Chart(ctx, {
-        type: 'bar', // or 'line', 'doughnut', etc.
-        data: {
-          labels: ['January', 'February', 'March', 'April', 'May', 'June'],
-          datasets: [{
-            label: 'Monthly Expenses',
-            data: [500, 400, 300, 700, 200, 400],
-            backgroundColor: 'rgba(54, 162, 235, 0.5)',
-            borderColor: 'rgba(54, 162, 235, 1)',
-            borderWidth: 1
-          }]
-        },
-        options: {
-          scales: {
-            y: {
-              beginAtZero: true
-            }
-          }
-        }
-      });
+    async fetchTransactions() {
+      this.isLoading = true;
+      this.error = null;
+      try {
+        const response = await axios.get('http://localhost:3000/api/transactions');
+        this.transactions = response.data;
+      } catch (error) {
+        this.error = "Failed to load transactions: " + (error.response?.data?.message || error.message);
+      } finally {
+        this.isLoading = false;
+      }
+    },
+    async addTransaction() {
+      try {
+        await axios.post('http://localhost:3000/api/transactions', this.newTransaction);
+        this.transactions.push({...this.newTransaction}); // Optionally add the new transaction to the list
+        this.newTransaction.amount = null; // Reset the amount after adding
+        this.fetchTransactions(); // Optionally re-fetch all transactions
+      } catch (error) {
+        this.error = "Failed to add transaction: " + (error.response?.data?.message || error.message);
+      }
     }
   }
 };
 </script>
+
