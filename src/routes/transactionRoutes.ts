@@ -1,22 +1,26 @@
 import { Router } from 'express';
 import { getRepository } from 'typeorm';
 import { Transaction } from '../entity/Transaction';
+import { authMiddleware } from '../middleware/authMiddleware';
 
 const router = Router();
 
-// GET transactions
-router.get('/', async (req, res) => {
+router.get('/', authMiddleware, async (req, res) => {
     const transactionRepository = getRepository(Transaction);
-    const transactions = await transactionRepository.find();
+    const transactions = await transactionRepository.find({ 
+        where: { user: req.user }
+    });
     res.json(transactions);
 });
 
-// POST a new transaction
-router.post('/', async (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
     const transactionRepository = getRepository(Transaction);
-    const transaction = transactionRepository.create(req.body);
-    const result = await transactionRepository.save(transaction);
-    res.send(result);
+    const transaction = transactionRepository.create({ 
+        ...req.body,
+        user: req.user // Link the transaction to the authenticated user
+    });
+    await transactionRepository.save(transaction);
+    res.json(transaction);
 });
 
 router.delete('/:id', async (req, res) => {

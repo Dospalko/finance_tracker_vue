@@ -1,9 +1,7 @@
 <template>
-  <div class="container mx-auto p-4">
+  <div class="container mx-auto p-4" v-if="isAuthenticated">
     <h2 class="text-xl font-bold mb-4">Dashboard</h2>
-  <button @click="logout">Logout</button>
-
-
+    <button @click="logout">Logout</button>
     <div v-if="isLoading" class="py-4">Loading...</div>
     <div v-else-if="error" class="py-4 text-red-600">{{ error }}</div>
     <div v-else>
@@ -36,8 +34,11 @@
       <button @click="updateTransaction"
         class="mt-3 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Save
         Changes</button>
-        
     </div>
+
+  </div>
+  <div v-else>
+    <p>Please log in to view this page.</p>
   </div>
 </template>
 
@@ -54,8 +55,16 @@ export default {
       selectedTransaction: null
     };
   },
+  
+  computed: {
+    isAuthenticated() {
+      return !!localStorage.getItem('token');
+    }
+  },
   async mounted() {
-    await this.fetchTransactions();
+    if (this.isAuthenticated) {
+      await this.fetchTransactions();
+    }
   },
   methods: {
     async fetchTransactions() {
@@ -95,6 +104,10 @@ export default {
     selectTransaction(transaction) {
       this.selectedTransaction = { ...transaction };
     },
+    logout() {
+      localStorage.removeItem('token');
+      this.$router.push({ name: 'login' });
+    },
     async updateTransaction() {
       try {
         await axios.put(`http://localhost:3000/api/transactions/${this.selectedTransaction.id}`, this.selectedTransaction);
@@ -103,11 +116,7 @@ export default {
       } catch (error) {
         this.error = "Failed to update transaction: " + (error.response?.data?.message || error.message);
       }
-    } ,logout() {
-      localStorage.removeItem('token'); // Remove the stored token
-      this.$router.push({ name: 'login' }); // Redirect to the login page
-      // If you're using a global state (like Vuex), update it here
-    }
+    } 
   }
 };
 </script>
