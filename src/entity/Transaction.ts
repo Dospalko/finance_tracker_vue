@@ -1,20 +1,22 @@
+// Transaction.ts
+
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { User } from './User';
 
 @Entity()
 export class Transaction {
   @PrimaryGeneratedColumn()
-  id!: number; // The '!' tells TypeScript this will be assigned by TypeORM
+  id!: number;
 
   @Column('decimal', { precision: 10, scale: 2 })
-  amount!: number; // Definite assignment assertion
+  amount!: number;
+
+  @Column({ nullable: true })
+  description!: string;
 
   @Column()
-  description!: string; // Definite assignment assertion
+  date!: Date;
 
-  @Column()
-  date!: Date; // Definite assignment assertion
-
-  @ManyToOne(() => User, user => user.transactions)
-  user!: User; // Definite assignment assertion for the relation
+  @ManyToOne(() => User, user => user.transactions, { eager: false })
+  user!: User; // Ensure this matches the property name in the User entity
 }

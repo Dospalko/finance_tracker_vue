@@ -1,8 +1,10 @@
 import express from 'express';
 import { createConnection } from 'typeorm';
 import cors from 'cors'; // import CORS
-import authController from './controllers/AuthController'; // make sure the path is correct
 import { authMiddleware } from './middleware/authMiddleware';
+import transactionRoutes from './routes/transactionRoutes';
+import authController from './controllers/authController'; // Import authController
+
 
 // Establish connection to the database
 createConnection().then(async connection => {
@@ -12,6 +14,8 @@ createConnection().then(async connection => {
   const app = express();
 
   // Use CORS middleware to enable cross-origin requests
+
+
   // For development you might allow all origins, but for production, specify your front-end's origin
   app.use(cors());
 
@@ -20,6 +24,7 @@ createConnection().then(async connection => {
 
   // Use your auth routes
   app.use('/auth', authController);
+  app.use('/api/transactions', transactionRoutes);
 
   // A secure route example
   app.get('/secure-route', authMiddleware, (req, res) => {

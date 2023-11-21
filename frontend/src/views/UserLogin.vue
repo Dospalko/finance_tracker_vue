@@ -9,7 +9,7 @@
             Username
           </label>
           <input type="text" id="username" v-model="user.username" required
-                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
         </div>
 
         <!-- Password Field -->
@@ -18,7 +18,7 @@
             Password
           </label>
           <input type="password" id="password" v-model="user.password" required
-                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline">
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline">
         </div>
 
         <!-- Error Message -->
@@ -28,7 +28,8 @@
 
         <!-- Submit Button -->
         <div class="flex items-center justify-between">
-          <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+          <button type="submit"
+            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
             Login
           </button>
         </div>
@@ -56,9 +57,11 @@ export default {
       this.errorMessage = '';
       this.isSubmitting = true;
       try {
+        // In loginUser method
         const response = await axios.post('http://localhost:3000/auth/login', this.user);
-        localStorage.setItem('token', response.data.token); 
+        localStorage.setItem('token', response.data.token);
         this.$router.push({ name: 'dashboard' });
+
       } catch (error) {
         if (error.response) {
           // Specific error from the server (e.g., invalid credentials)
